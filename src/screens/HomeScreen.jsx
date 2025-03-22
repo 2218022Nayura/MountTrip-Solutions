@@ -11,7 +11,10 @@ import {
   Animated,
 } from 'react-native';
 import DestinationCard from '../components/DestinationCard';
+import InfoModal from '../components/InfoModal';
+import SearchBar from '../components/SearchBar';
 
+// Data destinasi gunung
 const destinations = [
   { id: '1', name: 'Gunung Bromo', image: require('../assets/images/Bromo.jpg') },
   { id: '2', name: 'Gunung Semeru', image: require('../assets/images/Semeru.jpg') },
@@ -23,15 +26,18 @@ const destinations = [
 ];
 
 export default function HomeScreen() {
+  // STATE: Menyimpan teks pencarian dari input
   const [search, setSearch] = useState('');
+
+  // STATE: Menyimpan status modal (terbuka/tutup)
   const [modalVisible, setModalVisible] = useState(false);
 
-  // Filter destinasi berdasarkan input pencarian
+  // FILTER: Menyaring destinasi berdasarkan input pencarian
   const filteredDestinations = destinations.filter((item) =>
     item.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Animasi Header (Fade In)
+  // STATE: Animasi Header (Fade In)
   const headerOpacity = useRef(new Animated.Value(0)).current;
   
   useEffect(() => {
@@ -44,24 +50,16 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Header dengan animasi Fade In */}
+      {/* HEADER dengan animasi Fade In */}
       <Animated.View style={[styles.header, { opacity: headerOpacity }]}>
         <Text style={styles.headerTitle}>MountTrip Solutions</Text>
         <Text style={styles.headerSubtitle}>Jelajahi Keindahan Gunung di Jawa Timur</Text>
       </Animated.View>
 
-      {/* Search Box */}
-      <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Cari destinasi gunung..."
-          placeholderTextColor="#777"
-          value={search}
-          onChangeText={setSearch}
-        />
-      </View>
+      {/* SEARCH BAR - Menggunakan state `search` dan `setSearch` sebagai props */}
+      <SearchBar search={search} setSearch={setSearch} />
 
-      {/* Menampilkan pesan jika tidak ada hasil pencarian */}
+      {/* Jika hasil pencarian kosong, tampilkan pesan */}
       {filteredDestinations.length === 0 ? (
         <Text style={styles.notFoundText}>Gunung tidak ditemukan</Text>
       ) : (
@@ -72,26 +70,15 @@ export default function HomeScreen() {
           contentContainerStyle={{ paddingBottom: 20 }}
           renderItem={({ item }) => (
             <TouchableOpacity onPress={() => alert(`Kamu memilih ${item.name}`)}>
+              {/* MENGIRIM PROPS: `name` dan `image` ke DestinationCard */}
               <DestinationCard name={item.name} image={item.image} />
             </TouchableOpacity>
           )}
         />
       )}
 
-      {/* Modal Info */}
-      <Modal visible={modalVisible} animationType="slide" transparent={true}>
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>MountTrip Solutions</Text>
-            <Text style={styles.modalText}>
-              Nikmati pengalaman wisata gunung yang lebih mudah dan menyenangkan dengan MountTrip Solutions!
-            </Text>
-            <Pressable style={styles.closeButton} onPress={() => setModalVisible(false)}>
-              <Text style={styles.buttonText}>Tutup</Text>
-            </Pressable>
-          </View>
-        </View>
-      </Modal>
+      {/* MODAL INFO - Menggunakan state `modalVisible` dan `setModalVisible` sebagai props */}
+      <InfoModal modalVisible={modalVisible} setModalVisible={setModalVisible} />
     </View>
   );
 }
@@ -120,59 +107,11 @@ const styles = StyleSheet.create({
     color: 'white',
     marginTop: 5,
   },
-  searchContainer: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    paddingHorizontal: 15,
-    paddingVertical: 10,
-    marginTop: -20,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 3,
-  },
-  input: {
-    fontSize: 16,
-  },
   notFoundText: {
     textAlign: 'center',
     marginTop: 20,
     fontSize: 16,
     color: '#777',
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-  },
-  modalContent: {
-    backgroundColor: 'white',
-    padding: 20,
-    borderRadius: 10,
-    width: '80%',
-    alignItems: 'center',
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 5,
-  },
-  modalText: {
-    fontSize: 16,
-    marginBottom: 10,
-    textAlign: 'center',
-    color: '#555',
-  },
-  closeButton: {
-    backgroundColor: '#007BFF',
-    padding: 10,
-    borderRadius: 8,
-    marginTop: 10,
-  },
-  buttonText: {
-    color: 'white',
-    fontWeight: 'bold',
   },
 });
 
